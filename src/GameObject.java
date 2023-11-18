@@ -6,6 +6,11 @@ int width;
 int height;
 int speed;
 boolean isActive;
+boolean movingUp = false;
+boolean movingDown = false;
+boolean movingLeft = false;
+boolean movingRight = false;
+
 
 public GameObject(int x, int y, int width, int height) {
 	this.x = x;

@@ -5,7 +5,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
 
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -18,6 +20,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 	Font subtitleFont;
 	Timer frameDraw;
 	Rocketship ship = new Rocketship (250, 700, 50, 50);
+	ObjectManager manager = new ObjectManager(ship);
+	public static BufferedImage image;
+	public static boolean needImage = true;
+	public static boolean gotImage = false;
 
 	@Override
 	public void paintComponent(Graphics g){
@@ -35,7 +41,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 	}
 
 	void updateGameState() {
-
+		manager.update();
 	}
 
 	void updateEndState() {
@@ -54,9 +60,11 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 	}	
 
 	void drawGameState(Graphics g) {
-		g.setColor(Color.BLACK);
-		g.fillRect(0, 0, LeagueInvaders.WIDTH, LeagueInvaders.HEIGHT);
-		ship.draw(g);
+		{
+			loadImage("Images/space.png");
+			manager.draw(g);
+			ship.update();
+		}
 	}
 
 	void drawEndState(Graphics g) {
@@ -88,7 +96,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		else if(currentState == END){
 			updateEndState();
 		}
-		System.out.println("action");
 		repaint();
 
 	}
@@ -104,35 +111,52 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		}
 
 		if (currentState == GAME) {
-			if (e.getKeyCode()==KeyEvent.VK_UP) {
-				ship.up();
-				if (ship.getY() < 0) {
-
-				}
+			if (e.getKeyCode()==KeyEvent.VK_UP || e.getKeyCode()==KeyEvent.VK_W) {
+				ship.movingUp = true;
 			}
 
-			if (e.getKeyCode()==KeyEvent.VK_DOWN) {
-				ship.down();
-
+			if (e.getKeyCode()==KeyEvent.VK_DOWN || e.getKeyCode()==KeyEvent.VK_S) {
+				ship.movingDown = true;
 			}
-				if (e.getKeyCode()==KeyEvent.VK_LEFT) {
-					ship.left();
-
-				}
-
-				if (e.getKeyCode()==KeyEvent.VK_RIGHT) {
-					ship.right();
-
-				}
-
-
+			if (e.getKeyCode()==KeyEvent.VK_LEFT || e.getKeyCode()==KeyEvent.VK_A) {
+				ship.movingLeft = true;
 			}
-		
+
+			if (e.getKeyCode()==KeyEvent.VK_RIGHT || e.getKeyCode()==KeyEvent.VK_D) {
+				ship.movingRight = true;
+			}
+
+
+		}
+
 	}
 
 	@Override
-	public void keyReleased(KeyEvent arg0) {
-		// TODO Auto-generated method stub
+	public void keyReleased(KeyEvent a) {
+		if (currentState == GAME) {
+			if (a.getKeyCode()==KeyEvent.VK_UP || a.getKeyCode()==KeyEvent.VK_W) {
+				ship.movingUp = false;
+
+			}
+
+			if (a.getKeyCode()==KeyEvent.VK_DOWN || a.getKeyCode()==KeyEvent.VK_S) {
+				ship.movingDown = false;
+
+
+			}
+			if (a.getKeyCode()==KeyEvent.VK_LEFT || a.getKeyCode()==KeyEvent.VK_A) {
+				ship.movingLeft = false;
+
+
+			}
+
+			if (a.getKeyCode()==KeyEvent.VK_RIGHT || a.getKeyCode()==KeyEvent.VK_D) {
+				ship.movingRight = false;
+
+			}
+
+
+		}
 
 	}
 
@@ -140,5 +164,17 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 	public void keyTyped(KeyEvent arg0) {
 		// TODO Auto-generated method stub
 
+	}
+
+	void loadImage(String imageFile) {
+		if (needImage) {
+			try {
+				image = ImageIO.read(this.getClass().getResourceAsStream("Images/space.png"));
+				gotImage = true;
+			} catch (Exception e) {
+
+			}
+			needImage = false;
+		}
 	}
 }
