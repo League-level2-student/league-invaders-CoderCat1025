@@ -12,6 +12,8 @@ public class ObjectManager implements ActionListener{
 	ArrayList<Alien> aliens = new ArrayList<>();
 	Random random = new Random();
 	int score = 0;
+	int highScore = 0;
+	ArrayList<Integer> scores = new ArrayList<>();
 
 	public ObjectManager (Rocketship rocket) {
 		this.rocket = rocket;
@@ -22,7 +24,7 @@ public class ObjectManager implements ActionListener{
 	}
 
 	void addAlien() {
-		aliens.add(new Alien(random.nextInt(LeagueInvaders.WIDTH),0,50,50));
+		aliens.add(new Alien(random.nextInt(LeagueInvaders.WIDTH - 20),0,50,50));
 	}
 
 	void update() {
@@ -55,7 +57,7 @@ public class ObjectManager implements ActionListener{
 	}
 
 	void purgeObjects() {
-		
+
 		for (int i = 0; i < aliens.size(); i++) {
 			if (aliens.get(i).isActive == false) {
 				aliens.remove(i);

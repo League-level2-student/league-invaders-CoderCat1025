@@ -5,12 +5,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.util.Random;
 
 import javax.imageio.ImageIO;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
+@SuppressWarnings("serial")
 public class GamePanel extends JPanel implements ActionListener, KeyListener{
 	final int MENU = 0;
 	final int GAME = 1;
@@ -22,6 +27,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 	Timer alienSpawn;
 	Rocketship ship = new Rocketship (250, 700, 50, 50);
 	ObjectManager manager = new ObjectManager(ship);
+	Random random = new Random();
 	public static BufferedImage image;
 	public static boolean needImage = true;
 	public static boolean gotImage = false;
@@ -78,6 +84,15 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 	}
 
 	void drawEndState(Graphics g) {
+		manager.scores.add(manager.score);
+		manager.highScore = manager.score;
+		
+		for (int i = 0; i < manager.scores.size(); i++) {
+			if (manager.scores.get(i)>manager.highScore) {
+				manager.highScore=manager.scores.get(i);
+			}
+		}
+		
 		g.setColor(Color.RED);
 		g.fillRect(0, 0, LeagueInvaders.WIDTH, LeagueInvaders.HEIGHT);
 		g.setFont(titleFont);
@@ -86,6 +101,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		g.setFont(subtitleFont);
 		g.drawString("Enemies Killed:", 120, 500);
 		g.drawString(String.valueOf(manager.getScore()), 325, 500);
+		g.drawString("High Score:", 150, 550);
+		g.drawString(String.valueOf(manager.highScore), 300, 550);
 		g.drawString("Press ENTER to restart", 110, 600);
 	}
 
@@ -113,7 +130,13 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		if (e.getKeyCode()==KeyEvent.VK_ENTER) {
+		if (currentState == MENU) {
+			if (e.getKeyCode()==KeyEvent.VK_SPACE) {
+				JOptionPane.showMessageDialog(null, "Aliens are invading! Use arrow keys or WASD to move and space to shoot. Don't get hit by the aliens!");
+			}
+		}
+
+		if (e.getKeyCode()==KeyEvent.VK_ENTER) { 
 			if (currentState == END) {
 				currentState = MENU;
 				ship = new Rocketship(250, 700, 50, 50);
@@ -146,6 +169,32 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 			}
 			if (e.getKeyCode()==KeyEvent.VK_SPACE || e.getKeyCode()==KeyEvent.VK_ALT) {
 				manager.addProjectile(ship.getProjectile());
+			}
+
+			//cheats
+
+			//adding extra points
+			if (e.getKeyCode()==KeyEvent.VK_1) {
+				manager.score++;
+			}
+			if (e.getKeyCode()==KeyEvent.VK_2) {
+				manager.score=manager.score+10;
+			}
+			if (e.getKeyCode()==KeyEvent.VK_3) {
+				manager.score=manager.score+100;
+			}
+
+			//killing all enemies
+			if (e.getKeyCode()==KeyEvent.VK_K) {
+				for (int i = 0; i < manager.aliens.size(); i++) {
+					manager.aliens.get(i).isActive=false;
+					manager.score++;
+				}
+			}
+
+			//spawn aliens
+			if (e.getKeyCode()==KeyEvent.VK_0) {
+				manager.aliens.add(new Alien(random.nextInt(LeagueInvaders.WIDTH - 20),0,50,50));
 			}
 
 		}
