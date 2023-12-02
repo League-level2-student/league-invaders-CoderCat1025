@@ -18,11 +18,16 @@ public class Alien extends GameObject{
 
 	void update() {
 		y+=speed;
+		super.update();
 	}
 
 	void draw(Graphics g) {
-		g.setColor(Color.YELLOW);
-		g.fillRect(x, y, width, height);
+		if (needImage) {
+			g.setColor(Color.YELLOW);
+			g.fillRect(x, y, width, height);
+		} else {
+			g.drawImage(image, x, y, width, height, null);
+		}
 	}
 
 

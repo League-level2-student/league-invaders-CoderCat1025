@@ -19,6 +19,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 	Font titleFont;
 	Font subtitleFont;
 	Timer frameDraw;
+	Timer alienSpawn;
 	Rocketship ship = new Rocketship (250, 700, 50, 50);
 	ObjectManager manager = new ObjectManager(ship);
 	public static BufferedImage image;
@@ -42,6 +43,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 
 	void updateGameState() {
 		manager.update();
+		if (ship.isActive==false) {
+			currentState=END;
+		}
 	}
 
 	void updateEndState() {
@@ -61,9 +65,15 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 
 	void drawGameState(Graphics g) {
 		{
+			g.setColor(Color.BLACK);
+			g.fillRect(0,  0,  LeagueInvaders.WIDTH, LeagueInvaders.HEIGHT);
 			loadImage("Images/space.png");
+			g.drawImage(image, 0, 0, LeagueInvaders.WIDTH, LeagueInvaders.HEIGHT, null);
+			g.setColor(Color.WHITE);
+			g.setFont(subtitleFont);
+			g.drawString("Score " + String.valueOf(manager.getScore()), 200, 50);
 			manager.draw(g);
-			ship.update();
+			ship.move();
 		}
 	}
 
@@ -74,7 +84,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		g.setColor(Color.BLACK);
 		g.drawString("GAME OVER", 100, 150);
 		g.setFont(subtitleFont);
-		g.drawString("You killed   enemies", 120, 500);
+		g.drawString("Enemies Killed:", 120, 500);
+		g.drawString(String.valueOf(manager.getScore()), 325, 500);
 		g.drawString("Press ENTER to restart", 110, 600);
 	}
 
@@ -105,7 +116,15 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		if (e.getKeyCode()==KeyEvent.VK_ENTER) {
 			if (currentState == END) {
 				currentState = MENU;
+				ship = new Rocketship(250, 700, 50, 50);
+				manager = new ObjectManager(ship);
 			} else {
+				if (currentState == GAME) {
+					alienSpawn.stop();
+				}
+				else if (currentState == MENU) {
+					startGame();
+				}
 				currentState++;
 			}
 		}
@@ -125,7 +144,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 			if (e.getKeyCode()==KeyEvent.VK_RIGHT || e.getKeyCode()==KeyEvent.VK_D) {
 				ship.movingRight = true;
 			}
-
+			if (e.getKeyCode()==KeyEvent.VK_SPACE || e.getKeyCode()==KeyEvent.VK_ALT) {
+				manager.addProjectile(ship.getProjectile());
+			}
 
 		}
 
@@ -176,5 +197,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 			}
 			needImage = false;
 		}
+	}
+
+	void startGame() {
+		alienSpawn = new Timer(1000, manager);
+		alienSpawn.start();
 	}
 }
